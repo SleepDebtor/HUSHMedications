@@ -8,18 +8,18 @@
 import SwiftUI
 import SwiftData
 
-struct ContentView: View {
+struct LabelView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Query private var medicationLabel: [MedicationLabel]
 
     var body: some View {
         NavigationSplitView {
             List {
-                ForEach(items) { item in
+                ForEach(medicationLabel) { item in
                     NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                        Text("Item at ")
                     } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                        Text("Medication")
                     }
                 }
                 .onDelete(perform: deleteItems)
@@ -46,7 +46,7 @@ struct ContentView: View {
 
     private func addItem() {
         withAnimation {
-            let newItem = Item(timestamp: Date())
+            let newItem = MedicationLabel()
             modelContext.insert(newItem)
         }
     }
@@ -54,7 +54,7 @@ struct ContentView: View {
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(items[index])
+                modelContext.delete(medicationLabel[index])
             }
         }
     }
@@ -62,5 +62,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: MedicationLabel.self, inMemory: true)
 }

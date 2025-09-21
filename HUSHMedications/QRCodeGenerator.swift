@@ -1,9 +1,10 @@
 import Foundation
 import CoreImage
 import CoreImage.CIFilterBuiltins
-import UIKit
+import ImageIO
+import UniformTypeIdentifiers
 
-/// Utility for generating QR codes as PNG data
+/// Utility for generating QR codes as PNG data (cross-platform)
 public struct QRCodeGenerator {
     /// Generate a QR code PNG from a string.
     /// - Parameters:
@@ -14,19 +15,20 @@ public struct QRCodeGenerator {
         let context = CIContext()
         let filter = CIFilter.qrCodeGenerator()
         filter.message = Data(string.utf8)
-        // Medium error correction level for balance between density and resilience
         filter.correctionLevel = "M"
 
         guard let outputImage = filter.outputImage else { return nil }
-
-        // Scale up the QR to make it crisp when rendered/printed
         let transform = CGAffineTransform(scaleX: scale, y: scale)
         let scaledImage = outputImage.transformed(by: transform)
 
         guard let cgImage = context.createCGImage(scaledImage, from: scaledImage.extent) else { return nil }
 
-        let uiImage = UIImage(cgImage: cgImage)
-        return uiImage.pngData()
+        // Encode to PNG using ImageIO
+        let data = NSMutableData()
+        guard let dest = CGImageDestinationCreateWithData(data as CFMutableData, UTType.png.identifier as CFString, 1, nil) else { return nil }
+        CGImageDestinationAddImage(dest, cgImage, nil)
+        guard CGImageDestinationFinalize(dest) else { return nil }
+        return data as Data
     }
 
     /// Generate a QR code PNG from a URL.
@@ -49,3 +51,4 @@ extension MedicationLabel {
         }
     }
 }
+

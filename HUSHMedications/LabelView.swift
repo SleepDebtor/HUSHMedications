@@ -61,6 +61,6 @@ struct LabelView: View {
 }
 
 #Preview {
-    ContentView()
+   LabelView()
         .modelContainer(for: MedicationLabel.self, inMemory: true)
 }

@@ -22,9 +22,6 @@ final class Patient {
     /// Date of birth
     var birthDate: Date
 
-    /// Mailing/residential address
-    var address: PostalAddress
-
     /// Full name composed from first/middle/last with proper spacing
     var fullName: String {
         if let mid = middleName, !mid.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -33,7 +30,19 @@ final class Patient {
             return "\(firstName) \(lastName)"
         }
     }
-
+    
+    var streetLine1: String
+    
+    var streetLine2: String?
+    
+    var city: String
+    
+    var state: String
+    
+    var postalCode: String
+    
+    var country: String
+    
     /// Age in whole years, computed from birthDate
     var age: Int {
         let now = Date()
@@ -49,7 +58,12 @@ final class Patient {
         lastName: String,
         medicalRecordNumber: String,
         birthDate: Date,
-        address: PostalAddress
+        streetLine1: String,
+        streetLine2: String? = nil,
+        city: String,
+        state: String,
+        postalCode: String,
+        country: String
     ) {
         self.id = id
         self.firstName = firstName
@@ -57,29 +71,8 @@ final class Patient {
         self.lastName = lastName
         self.medicalRecordNumber = medicalRecordNumber
         self.birthDate = birthDate
-        self.address = address
-    }
-}
-
-/// A simple postal address stored inline with Patient.
-struct PostalAddress: Codable, Hashable {
-    var line1: String
-    var line2: String?
-    var city: String
-    var state: String
-    var postalCode: String
-    var country: String
-
-    init(
-        line1: String,
-        line2: String? = nil,
-        city: String,
-        state: String,
-        postalCode: String,
-        country: String
-    ) {
-        self.line1 = line1
-        self.line2 = line2
+        self.streetLine1 = streetLine1
+        self.streetLine2 = streetLine2
         self.city = city
         self.state = state
         self.postalCode = postalCode

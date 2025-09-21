@@ -32,7 +32,8 @@ final class MedicationLabel {
     /// Best used by / expiration date (optional)
     var bestByDate: Date?
 
-    /// Linked patient for this label (optional)
+    /// Linked patient for this label (nullified on patient delete)
+    @Relationship(deleteRule: .nullify)
     var patient: Patient?
 
     /// Medication display name for the label (e.g., "Amoxicillin")
@@ -57,16 +58,16 @@ final class MedicationLabel {
 
     init(
         createdAt: Date = .now,
-        pharmacyIdentifier: String,
-        rxNumber: String,
-        medicationIdentifier: String,
+        pharmacyIdentifier: String = "",
+        rxNumber: String = "",
+        medicationIdentifier: String = "",
         lotNumber: String? = nil,
         bestByDate: Date? = nil,
         patient: Patient? = nil,
-        medicationName: String,
-        dose: String,
-        dispenseAmount: Int,
-        sig: String,
+        medicationName: String = "",
+        dose: String = "",
+        dispenseAmount: Int = 0,
+        sig: String = "",
         qrImageData: Data? = nil
     ) {
         self.createdAt = createdAt

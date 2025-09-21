@@ -12,7 +12,7 @@ import SwiftData
 struct HUSHMedicationsApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            MedicationLabel.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +25,7 @@ struct HUSHMedicationsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PatientListView()
         }
         .modelContainer(sharedModelContainer)
     }

@@ -24,7 +24,7 @@ struct MedicationEditView: View {
                 TextField("Pharmacy", text: $medication.pharmacy)
                 TextField("Pharmacy Website", text: $medication.pharmacyWebsite)
 #if os(iOS)
-                    .keyboardType(.url)
+                    .keyboardType(.URL)
                     .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
 #endif
@@ -33,7 +33,7 @@ struct MedicationEditView: View {
             Section("Hush") {
                 TextField("Hush Website", text: $medication.hushWebsite)
 #if os(iOS)
-                    .keyboardType(.url)
+                    .keyboardType(.URL)
                     .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
 #endif
@@ -69,7 +69,7 @@ struct MedicationEditView: View {
                 ForEach($medication.labels) { $label in
                     VStack(alignment: .leading) {
                         TextField("Label Name", text: $label.medicationName)
-                        TextField("Details (optional)", text: $label.dose)
+                        TextField("Dose", text: $label.dose)
                     }
                     .padding(.vertical, 4)
                 }

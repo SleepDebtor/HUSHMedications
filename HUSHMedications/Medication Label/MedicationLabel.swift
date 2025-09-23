@@ -36,6 +36,10 @@ final class MedicationLabel {
     @Relationship(deleteRule: .nullify)
     var patient: Patient?
 
+    /// Linked patient for this label (nullified on patient delete)
+    @Relationship(deleteRule: .nullify)
+    var medication: Medication?
+    
     /// Medication display name for the label (e.g., "Amoxicillin")
     var medicationName: String
 
@@ -44,6 +48,9 @@ final class MedicationLabel {
 
     /// Quantity dispensed
     var dispenseAmount: Int
+    
+    /// Dose number for calculations
+    var doseNum: Double
 
     /// SIG: Directions for use (e.g., "Take 1 tablet by mouth every 8 hours")
     var sig: String
@@ -66,6 +73,7 @@ final class MedicationLabel {
         patient: Patient? = nil,
         medicationName: String = "",
         dose: String = "",
+        doseNum: Double = 0.0,
         dispenseAmount: Int = 0,
         sig: String = "",
         qrImageData: Data? = nil
@@ -82,5 +90,6 @@ final class MedicationLabel {
         self.dispenseAmount = dispenseAmount
         self.sig = sig
         self.qrImageData = qrImageData
+        self.doseNum = doseNum
     }
 }

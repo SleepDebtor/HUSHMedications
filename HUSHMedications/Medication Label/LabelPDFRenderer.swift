@@ -66,7 +66,7 @@ public struct LabelPDFRenderer {
             cursorY = rect.maxY + spacing
         }
 
-        let patientName = label.patient?.fullName ?? ""
+        let patientName = label.patient?.fullName ?? "Last, First"
         drawText(patientName, font: patientFont)
         drawText(label.medicationName, font: medFont)
         drawText(label.sig, font: sigFont)

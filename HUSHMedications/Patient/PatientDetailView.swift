@@ -1,6 +1,13 @@
 import SwiftUI
 import SwiftData
 
+#if os(iOS)
+import UIKit
+#endif
+#if os(macOS)
+import AppKit
+#endif
+
 // A cross-platform SwiftUI view for displaying details of a Patient model.
 struct PatientDetailView: View {
     @State var patient: Patient
@@ -108,16 +115,56 @@ struct PatientDetailView: View {
                     .padding(.vertical, 4)
             } else {
                 ForEach(labels) { label in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(label.medicationName)
-                            .font(.body).bold()
-                        Text(label.createdAt, style: .date)
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
+                    NavigationLink {
+                        MedicationLabelDetailView(label: label)
+                    } label: {
+                        HStack(alignment: .top, spacing: 12) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .fill(.thinMaterial)
+                                    .frame(width: 44, height: 44)
+                                Image(systemName: "pills.fill")
+                                    .foregroundStyle(.tint)
+                            }
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack {
+                                    Text(label.medicationName.isEmpty ? "(Unnamed Label)" : label.medicationName)
+                                        .font(.headline)
+                                }
+                                Text(label.dose.isEmpty ? "No dose set" : label.dose)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                HStack(spacing: 8) {
+                                    Image(systemName: "calendar")
+                                        .foregroundStyle(.tertiary)
+                                    Text(label.createdAt, style: .date)
+                                        .font(.caption)
+                                        .foregroundStyle(.tertiary)
+                                }
+                            }
+                            Spacer()
+                        }
+                        .padding(8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .strokeBorder(.quaternary, lineWidth: 1)
+                        )
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(8)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button {
+                            printLabel(label)
+                        } label: {
+                            Label("Print", systemImage: "printer")
+                        }
+                        .tint(.blue)
+                    }
+                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            deleteLabel(label)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
                 }
             }
         }
@@ -142,6 +189,35 @@ struct PatientDetailView: View {
         df.dateStyle = .medium
         df.timeStyle = .none
         return df.string(from: date)
+    }
+
+    private func printLabel(_ label: MedicationLabel) {
+        guard let pdfData = label.generatePDFLabel(dpi: 300) else { return }
+#if os(iOS)
+        let printInfo = UIPrintInfo(dictionary: nil)
+        printInfo.outputType = .general
+        printInfo.jobName = label.medicationName.isEmpty ? "Medication Label" : label.medicationName
+        let controller = UIPrintInteractionController.shared
+        controller.printInfo = printInfo
+        controller.printingItem = pdfData
+        controller.present(animated: true, completionHandler: nil)
+#elseif os(macOS)
+        if let tempURL = try? FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: NSTemporaryDirectory()), create: true).appendingPathComponent(UUID().uuidString).appendingPathExtension("pdf") {
+            do {
+                try pdfData.write(to: tempURL)
+                NSWorkspace.shared.open(tempURL) // Opens Preview; user can print from there
+            } catch {
+                print("Failed to write temp PDF: \(error)")
+            }
+        }
+#endif
+    }
+
+    private func deleteLabel(_ label: MedicationLabel) {
+        withAnimation {
+            modelContext.delete(label)
+            do { try modelContext.save() } catch { print("Failed to delete label: \(error)") }
+        }
     }
 
     @ToolbarContentBuilder

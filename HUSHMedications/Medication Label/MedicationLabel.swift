@@ -36,7 +36,7 @@ final class MedicationLabel {
     @Relationship(deleteRule: .nullify)
     var patient: Patient?
 
-    /// Linked patient for this label (nullified on patient delete)
+    /// Linked medication for this label (nullified on patient delete)
     @Relationship(deleteRule: .nullify)
     var medication: Medication?
     
@@ -47,7 +47,7 @@ final class MedicationLabel {
     var dose: String
 
     /// Quantity dispensed
-    var dispenseAmount: Int
+    var dispenseAmount: Double
     
     /// Dose number for calculations
     var doseNum: Double
@@ -62,6 +62,9 @@ final class MedicationLabel {
     var qrURL: URL? {
         URL(string: "https://hushmedicalspa.com/medications/\(medicationIdentifier)")
     }
+    
+    ///The provider who wrote the prescription
+    var prescriber: Provider?
 
     init(
         createdAt: Date = .now,
@@ -74,7 +77,7 @@ final class MedicationLabel {
         medicationName: String = "",
         dose: String = "",
         doseNum: Double = 0.0,
-        dispenseAmount: Int = 0,
+        dispenseAmount: Double = 0.0,
         sig: String = "",
         qrImageData: Data? = nil
     ) {
@@ -91,5 +94,25 @@ final class MedicationLabel {
         self.sig = sig
         self.qrImageData = qrImageData
         self.doseNum = doseNum
+    }
+    
+    /// The amount to fill the syringe
+    var fillAmount: Double {
+        if let concentration = medication?.concentrationPrimaryMedicationPerMl {
+            let doseInMl = doseNum / concentration
+            return Double(doseInMl)
+        }
+        return 0.0
+    }
+    
+    ///The amount of th e second drug given based on the amount of the first drug
+    var secondDrugAmount: Double {
+        if let concentration = medication?.concentrationPrimaryMedicationPerMl,
+           let secondDrugConcentration = medication?.concentrationSecondaryMedicationPerMl {
+            let doseInMl = doseNum / concentration
+            let secondDrugDoseInMl = doseInMl * secondDrugConcentration
+            return secondDrugDoseInMl
+        }
+        return 0
     }
 }

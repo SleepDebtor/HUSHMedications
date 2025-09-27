@@ -10,6 +10,7 @@ struct PatientListView: View {
     @State private var draftPatient: Patient? = nil
     @State private var showingNewMedicationSheet = false
     @State private var draftMedication: Medication? = nil
+    @State private var showingNewProviderSheet = false
 
     var body: some View {
         NavigationStack {
@@ -31,6 +32,7 @@ struct PatientListView: View {
                     Menu {
                         Button("New Patient", action: addPatient)
                         Button("New Medication", action: addMedication)
+                        Button("New Provider", action: addProvider)
                     } label: {
                         Label("Add", systemImage: "plus")
                     }
@@ -81,6 +83,9 @@ struct PatientListView: View {
                 }
             }
         }
+        .sheet(isPresented: $showingNewProviderSheet) {
+            ProviderEditView()
+        }
     }
 
     // MARK: - Actions
@@ -112,6 +117,10 @@ struct PatientListView: View {
             labels: []
         )
         showingNewMedicationSheet = true
+    }
+    
+    private func addProvider() {
+        showingNewProviderSheet = true
     }
 
     private func save(_ patient: Patient) {

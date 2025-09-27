@@ -10,13 +10,22 @@ struct MedicationLabelDetailView: View {
   @Bindable var label: MedicationLabel
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
+  @Query private var providers: [Provider]
 
   var body: some View {
     Form {
       Section("Overview") {
           Text(label.patient?.fullName ?? "Undefined")
           .foregroundColor(.secondary)
-          Text(label.createdAt.formatted(date: .numeric, time: .shortened))
+          // Picker for prescriber/provider
+          Picker("Provider", selection: $label.prescriber) {
+            Text("None").tag(nil as Provider?)
+            ForEach(providers, id: \.licenseNumber) { provider in
+              Text("\(provider.providerName), \(provider.degree)").tag(provider as Provider?)
+            }
+          }
+          .pickerStyle(.menu)
+          Text("Created on: \(label.createdAt.formatted(date: .numeric, time: .shortened))")
           .foregroundColor(.secondary)
       }
 

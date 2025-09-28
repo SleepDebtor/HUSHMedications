@@ -1,5 +1,8 @@
 import SwiftUI
 import SwiftData
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct ProviderEditView: View {
     @Environment(\.modelContext) private var modelContext
@@ -25,7 +28,9 @@ struct ProviderEditView: View {
                     TextField("Full Name", text: $provider.providerName)
                     TextField("Degree (MD, DO, NP, etc.)", text: $provider.degree)
                     TextField("NPI", text: $provider.npi)
+#if canImport(UIKit)
                         .keyboardType(.numberPad)
+#endif
                     TextField("DEA Number", text: $provider.dea)
                     TextField("License Number", text: $provider.licenseNumber)
                 }

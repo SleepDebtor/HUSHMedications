@@ -13,6 +13,9 @@ struct HUSHMedicationsApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             MedicationLabel.self,
+            Medication.self,
+            Patient.self,
+            Provider.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
